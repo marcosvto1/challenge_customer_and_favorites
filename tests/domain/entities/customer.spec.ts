@@ -26,4 +26,12 @@ describe('Customer', () => {
 
     expect(sut)
   })
+
+  it("should return error if email is invalid", () => {
+    const emailInvalid = new Email("email");
+    const sut = new Customer("any_name", emailInvalid)
+
+    expect(sut.isValid()).toBeFalsy();
+  })
+
 })

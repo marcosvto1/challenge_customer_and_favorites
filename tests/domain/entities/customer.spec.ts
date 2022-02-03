@@ -33,5 +33,10 @@ describe('Customer', () => {
 
     expect(sut.isValid()).toBeFalsy();
   })
+ 
+  it("should return ok if name and email is provided", () => {
+    const sut = new Customer("any_name", email)
 
+    expect(sut.isValid()).toBeTruthy();
+  })
 })

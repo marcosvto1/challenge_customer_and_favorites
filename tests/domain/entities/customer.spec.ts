@@ -1,5 +1,7 @@
 import { Customer } from "@/domain/entities/customer";
+import { Product } from "@/domain/entities/product";
 import { Email } from "@/domain/vos/email";
+
 
 describe('Customer', () => {
   let email: Email;
@@ -26,5 +28,19 @@ describe('Customer', () => {
     const sut = new Customer("any_name", email)
 
     expect(sut.isValid()).toBeTruthy();
+  })
+
+  it('should return erro if exists a product in favorites', () => {
+    const sut = new Customer("any_name", email)
+    const product = new Product(
+      10,
+      'http://sandboximage/item.png',
+      'any_id',
+      'any_title',
+      1
+    );
+    sut.addFavoriteProduct(product)
+
+    expect(sut.isValid()).toBeFalsy();
   })
 })

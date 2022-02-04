@@ -44,4 +44,18 @@ describe('Customer', () => {
 
     expect(sut.isValid()).toBeFalsy();
   })
+
+  it('should return ok when correct params', () => {
+    const sut = new Customer("any_name", email)
+    const product = new Product(
+      'any_title',
+      10,
+      'http://sandboximage/item.png',
+      'any_id',  
+      1
+    );
+    sut.addFavoriteProduct(product)
+
+    expect(sut.isValid()).toBeTruthy();
+  })
 })

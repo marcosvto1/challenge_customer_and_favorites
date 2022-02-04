@@ -30,15 +30,16 @@ describe('Customer', () => {
     expect(sut.isValid()).toBeTruthy();
   })
 
-  it('should return erro if exists a product in favorites', () => {
+  it('should return error if exists a product in favorites', () => {
     const sut = new Customer("any_name", email)
     const product = new Product(
+      'any_title',
       10,
       'http://sandboximage/item.png',
-      'any_id',
-      'any_title',
+      'any_id',  
       1
     );
+    sut.addFavoriteProduct(product)
     sut.addFavoriteProduct(product)
 
     expect(sut.isValid()).toBeFalsy();

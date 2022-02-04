@@ -17,8 +17,8 @@ export class Customer extends Entity {
   }
 
   public addFavoriteProduct(product: Product) {
-    const productExists = this.favoritesProducts.find(p => p === product)
-    if (productExists) {
+    const productFound = this.favoritesProducts.find(p => p === product)
+    if (productFound) {
       this.addNotification("product", "Este produt já esta cadastrado")
     }
     this.favoritesProducts.push(product)

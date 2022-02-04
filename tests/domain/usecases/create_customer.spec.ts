@@ -72,6 +72,9 @@ export class CreateCustomerUserCase extends Notifiable {
       this.addNotifications([customerInput])
       return new UserCaseResult(false, customerInput.getNotifications());
     }
+
+    // Verificar se já customer
+    
     
     return new UserCaseResult(false, []);
 
@@ -124,13 +127,14 @@ describe('CreateCustomerCustomer', () => {
     expect(response.messages[0]).toBeInstanceOf(Notification);
   });
 
-  // it('should return error if email is invalid', async () => {
-  //   const customerRepo = mock<ICustomerRepository>();
-  //   const sut = new CreateCustomerUserCase(customerRepo);
-  //   await sut.execute({...customerDto, email: "email_invalid"});
+  it('should call CustomerRepository.emailExists with correct param', async () => {
+    const customerRepo = mock<ICustomerRepository>();
+    const sut = new CreateCustomerUserCase(customerRepo);
 
-  //   expect(sut.isValid()).toBeFalsy()
-  // })
+    await sut.execute(customerInput);
+
+    expect(customerRepo).toBeCalledWith(customerInput.email);
+  })
 
   // it('should is failed if already exists customer', async () => {
   //   const customerRepo = mock<ICustomerRepository>();

@@ -17,6 +17,7 @@ export class Customer extends Entity {
   }
 
   public addFavoriteProduct(product: Product) {
+    this.addNotifications([product])
     const productFound = this.favoritesProducts.find(p => p === product)
     if (productFound) {
       this.addNotification("product", "Este produt já esta cadastrado")

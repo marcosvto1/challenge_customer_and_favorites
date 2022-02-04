@@ -48,11 +48,11 @@ class UserCaseResult {
 
 
 export interface ICustomerRepository {
-  existsByEmail(email: string): Promise<boolean> 
+  emailExists(email: string): Promise<boolean> 
 }
 
 export class CustomerRepo implements ICustomerRepository {
-  existsByEmail(email: string): Promise<boolean> {
+  emailExists(email: string): Promise<boolean> {
     throw new Error("Method not implemented.");
   }
 }
@@ -73,7 +73,15 @@ export class CreateCustomerUserCase extends Notifiable {
       return new UserCaseResult(false, customerInput.getNotifications());
     }
 
-    // Verificar se já customer
+    // Verificar se já existe um email de customer que esta cadastrado
+    const emailAlreadyExists = await this.customerRepo.emailExists(customerInput.email);
+    if (!emailAlreadyExists) {
+      this.addNotification("Email", "Este E-mail já está em uso");
+    }
+
+    if (this.isValid()) {
+      return new UserCaseResult(false, this.getNotifications());
+    }
     
     
     return new UserCaseResult(false, []);
@@ -116,11 +124,10 @@ describe('CreateCustomerCustomer', () => {
 
   it('should return result with error when input data is invalid', async () => {
     const customerRepo = mock<ICustomerRepository>();
-    customerInput.email = "";
-    customerInput.name = "";
+    const customerInputInvalid = new CreateCustomerInput("", "")
     const sut = new CreateCustomerUserCase(customerRepo);
 
-    const response = await sut.execute(customerInput);
+    const response = await sut.execute(customerInputInvalid);
 
     expect(sut.isValid()).toBeFalsy();
     expect(response.success).toBeFalsy();
@@ -133,7 +140,7 @@ describe('CreateCustomerCustomer', () => {
 
     await sut.execute(customerInput);
 
-    expect(customerRepo).toBeCalledWith(customerInput.email);
+    expect(customerRepo.emailExists).toBeCalledWith(customerInput.email);
   })
 
   // it('should is failed if already exists customer', async () => {

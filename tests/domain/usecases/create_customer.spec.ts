@@ -60,7 +60,7 @@ describe('CreateCustomerCustomer', () => {
     expect(sut.isValid()).toBeFalsy()
   })
 
-  it('should return error if already exists customer', async () => {
+  it('should is failed if already exists customer', async () => {
     const customerRepo = mock<ICustomerRepository>();
     customerRepo.existsByEmail.mockResolvedValueOnce(false);    
     const sut = new CreateCustomerUserCase(customerRepo);
@@ -71,5 +71,18 @@ describe('CreateCustomerCustomer', () => {
 
     const expected = sut.getNotifications().find(el => el.key === "Customer.id")
     expect(expected).toEqual(expected);
-  })
+  });
+
+  // it('should call CustomerRepository.saveCustomer with correct params', async () => {
+  //   const customerRepo = mock<ICustomerRepository>();
+  //   customerRepo.existsByEmail.mockResolvedValueOnce(false);    
+  //   const sut = new CreateCustomerUserCase(customerRepo);
+
+  //   await sut.execute(customerDto);
+
+  //   expect(sut.isValid()).toBeFalsy()
+
+  //   const expected = sut.getNotifications().find(el => el.key === "Customer.id")
+  //   expect(expected).toEqual(expected);
+  // })
 })

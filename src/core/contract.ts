@@ -9,7 +9,6 @@ export class Contract extends Notifiable {
   }
 
   public isEmail(value: any, key: string, message: string): Contract {
-    console.log(value);
     const rgex =/^[a-z0-9.]+@[a-z0-9]+\.[a-z]+(\.[a-z]+)?$/i
     if (!rgex.test(value)) {
       this.addNotification(key, message || "Email invalid")

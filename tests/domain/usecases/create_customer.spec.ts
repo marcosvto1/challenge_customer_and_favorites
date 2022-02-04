@@ -1,6 +1,50 @@
-import { Notifiable } from '@/core';
+import { Contract, Notifiable, Notification } from '@/core';
+import { Customer } from '@/domain/entities/customer';
 import { Email } from '@/domain/vos/email';
-import { mock } from 'jest-mock-extended'
+import { mock, MockProxy } from 'jest-mock-extended'
+
+interface IUseCaseInput {
+  validate(): void
+}
+
+export class CreateCustomerInput extends Notifiable implements IUseCaseInput {
+
+  constructor(
+    public name: string,
+    public email: string
+  ) {
+    super();
+  }
+
+  validate(): void {
+    this.addNotifications([
+      new Contract().requires(this.name, "name", "Nome Obrigatório")
+      .requires(this.email, "email", "Email obrigatório")
+      .isEmail(this.email, "email", "Email inválido")
+    ])
+  }
+
+}
+
+interface IUserCaseResult {
+  success: boolean
+  messages: Notification[]
+}
+
+class UserCaseResult {
+  public success: boolean;
+  public messages: Notification[];
+
+  public constructor(success: boolean, messages: Notification[]) {
+    this.success = success;
+    this.messages = messages;
+  }
+
+  public static create() {
+    return new UserCaseResult(false, []);
+  }
+
+}
 
 
 export interface ICustomerRepository {
@@ -21,59 +65,96 @@ export class CreateCustomerUserCase extends Notifiable {
     this.customerRepo = customerRepo;
   }
   
-  async execute(customerDto: { email: string}) {
-    // Create VOs
-    const email = new Email(customerDto.email);
-    this.addNotifications([email])
-
-    const customerAlreadyExists = await this.customerRepo.existsByEmail(customerDto.email);
-    console.log(customerAlreadyExists);
-    if (customerAlreadyExists) {
-      this.addNotification("Customer.id", "Customer already exists")
+  async execute(customerInput: CreateCustomerInput): Promise<IUserCaseResult> {
+    // Validate Input Data
+    customerInput.validate();
+    if (!customerInput.isValid()) {
+      this.addNotifications([customerInput])
+      return new UserCaseResult(false, customerInput.getNotifications());
     }
-
     
+    return new UserCaseResult(false, []);
+
+    // const email = new Email(customerDto.email);
+    // const customer = new Customer(customerDto.name, email)
+    // this.addNotifications([email, customer]);
+
+    // if (this.isValid()) {
+    //   return this.getNotifications();
+    // }
+
+    // if (!email.isValid()) {
+    //   return email.getNotifications();
+    // }
+
+    // const customerAlreadyExists = await this.customerRepo.existsByEmail(customerDto.email);
+    // if (customerAlreadyExists) {
+    //   this.addNotification("Customer.id", "Customer already exists")
+    //   return this.getNotifications();
+    // }
+
+  
+    // if (!customer.isValid()) {
+    //   return customer.getNotifications();
+    // }
+    
+    // /// this.customerRepo.saveCustomer(customer);
+
+    // return new UserCaseResult(false, []);
   }
 }
 
 describe('CreateCustomerCustomer', () => {
-  let customerDto: any;
+  let customerInput: CreateCustomerInput;
 
   beforeAll(() => {
-    customerDto = {
-      email: 'any@mail.com.br'
-    }
+    customerInput = new CreateCustomerInput("any_name", "email@mail.com")
   })
 
-  it('should call customerRepository.exists with correct value', async () => {
+  it('should return result with error when input data is invalid', async () => {
     const customerRepo = mock<ICustomerRepository>();
-    const sut = new CreateCustomerUserCase(customerRepo);
-    await sut.execute(customerDto);
-
-    expect(customerRepo.existsByEmail).toBeCalledWith('any_email@mail.com');
-  })
-
-  it('should return error if email is invalid', async () => {
-    const customerRepo = mock<ICustomerRepository>();
-    const sut = new CreateCustomerUserCase(customerRepo);
-    await sut.execute({...customerDto, email: "email_invalid"});
-
-    expect(sut.isValid()).toBeFalsy()
-  })
-
-  fit('should is failed if already exists customer', async () => {
-    const customerRepo = mock<ICustomerRepository>();
-    customerRepo.existsByEmail.mockResolvedValueOnce(true);    
+    customerInput.email = "";
+    customerInput.name = "";
     const sut = new CreateCustomerUserCase(customerRepo);
 
-    await sut.execute(customerDto);
+    const response = await sut.execute(customerInput);
 
-    expect(sut.isValid()).toBeFalsy()
-    console.log(sut.getNotifications())
-
-    const expected = sut.getNotifications().find(el => el.key === "Customer.id")
-    expect(expected).toEqual(expected);
+    expect(sut.isValid()).toBeFalsy();
+    expect(response.success).toBeFalsy();
+    expect(response.messages[0]).toBeInstanceOf(Notification);
   });
+
+  // it('should return error if email is invalid', async () => {
+  //   const customerRepo = mock<ICustomerRepository>();
+  //   const sut = new CreateCustomerUserCase(customerRepo);
+  //   await sut.execute({...customerDto, email: "email_invalid"});
+
+  //   expect(sut.isValid()).toBeFalsy()
+  // })
+
+  // it('should is failed if already exists customer', async () => {
+  //   const customerRepo = mock<ICustomerRepository>();
+  //   customerRepo.existsByEmail.mockResolvedValueOnce(true);    
+  //   const sut = new CreateCustomerUserCase(customerRepo);
+
+  //   await sut.execute(customerDto);
+
+  //   const expected = sut.getNotifications().find(el => el.key === "Customer.id")
+  //   expect(sut.isValid()).toBeFalsy()
+  //   expect(expected).toEqual(expected);
+  // });
+
+  // it('should is failed if name is empty', async () => {
+  //   const customerRepo = mock<ICustomerRepository>();
+  //   customerRepo.existsByEmail.mockResolvedValueOnce(false);    
+  //   const sut = new CreateCustomerUserCase(customerRepo);
+
+  //   await sut.execute({...customerDto, name: ""})
+
+  //   const expected = sut.getNotifications().find(el => el.key === "Customer.name")
+  //   expect(sut.isValid()).toBeFalsy()
+  //   expect(expected).toEqual(expected);
+  // })
 
   // it('should call CustomerRepository.saveCustomer with correct params', async () => {
   //   const customerRepo = mock<ICustomerRepository>();

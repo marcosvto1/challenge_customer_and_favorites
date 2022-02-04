@@ -21,12 +21,13 @@ export class CreateCustomerUserCase extends Notifiable {
     this.customerRepo = customerRepo;
   }
   
-  async execute(customerDto: { id: any, email: string}) {
+  async execute(customerDto: { email: string}) {
     // Create VOs
     const email = new Email(customerDto.email);
     this.addNotifications([email])
 
     const customerAlreadyExists = await this.customerRepo.existsByEmail(customerDto.email);
+    console.log(customerAlreadyExists);
     if (customerAlreadyExists) {
       this.addNotification("Customer.id", "Customer already exists")
     }
@@ -40,7 +41,7 @@ describe('CreateCustomerCustomer', () => {
 
   beforeAll(() => {
     customerDto = {
-      email: 'any_email@mail.com'
+      email: 'any@mail.com.br'
     }
   })
 
@@ -60,14 +61,15 @@ describe('CreateCustomerCustomer', () => {
     expect(sut.isValid()).toBeFalsy()
   })
 
-  it('should is failed if already exists customer', async () => {
+  fit('should is failed if already exists customer', async () => {
     const customerRepo = mock<ICustomerRepository>();
-    customerRepo.existsByEmail.mockResolvedValueOnce(false);    
+    customerRepo.existsByEmail.mockResolvedValueOnce(true);    
     const sut = new CreateCustomerUserCase(customerRepo);
 
     await sut.execute(customerDto);
 
     expect(sut.isValid()).toBeFalsy()
+    console.log(sut.getNotifications())
 
     const expected = sut.getNotifications().find(el => el.key === "Customer.id")
     expect(expected).toEqual(expected);

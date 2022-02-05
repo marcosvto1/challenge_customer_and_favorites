@@ -1,6 +1,7 @@
 import { CreateCustomerInput } from '@/domain/usecases/customers/create/customer.input';
 import { UserCase } from '@/shared/usecases/usecase';
 import { Controller, Post, Get, Middleware } from '@overnightjs/core';
+import { Response } from 'express';
 
 @Controller('customers')
 export class CreateCustomerController {

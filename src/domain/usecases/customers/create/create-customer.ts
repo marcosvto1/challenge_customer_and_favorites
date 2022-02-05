@@ -38,9 +38,18 @@ export class CreateCustomerUserCase extends Notifiable implements UserCase<Creat
       return Result.Failed(this.getNotifications());
     }
 
-    const customerSaved = await this.customerRepo.saveCustomer(customer);
-    if (!customerSaved) {
-      return Result.Failed(new Notification("user", "Failed to save customer"))
+    const resultSaveCustomer = await this.customerRepo.saveCustomer({
+      name: customer.getNome(),
+      email: customer.getEmail().getValue()
+    });
+
+    if (!resultSaveCustomer) {
+      return Result.Failed(new Notification("customer", "Não foi possível salvar customer"))
+    }
+
+    const customerSaved = CustomerMap.toEntity(resultSaveCustomer);
+    if (!customerSaved.isValid()) {
+      return Result.Failed(customerSaved.getNotifications())
     }
     
     return Result.Ok(CustomerMap.toResponse(customerSaved));

@@ -5,7 +5,7 @@ import * as cors from 'cors';
 
 import {createConnection} from "typeorm";
 import { ormconfig } from "@/main/config/database";
-import { makeCustomerController } from '@/main/factories/create-customer';
+import { makeCustomerControllers } from '@/main/factories/controllers/customer';
 
 export class Startup extends Server {
 
@@ -22,7 +22,7 @@ export class Startup extends Server {
   public setupExpress() {
     this.app.use(bodyParser.json())
     this.app.use(
-      cors({
+      cors.default({
         origin: '*',
       })
     );
@@ -30,7 +30,7 @@ export class Startup extends Server {
 
   public setupControllers() {
     this.addControllers([
-      makeCustomerController()
+      ...makeCustomerControllers(),     
     ]);      
   }
 

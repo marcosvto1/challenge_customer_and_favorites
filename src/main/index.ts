@@ -6,7 +6,7 @@ import { Startup } from "@/main/startup";
 
 (async() => {
   try {
-    const startup = new Startup(3000);
+    const startup = new Startup(3001);
  //   console.log(startup)
 
     await startup.init();

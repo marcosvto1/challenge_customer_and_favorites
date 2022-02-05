@@ -51,14 +51,20 @@ describe('CreateCustomerCustomer', () => {
 
     await sut.execute(customerInput)
 
-    expect(customerRepo.saveCustomer).toBeCalledWith(new Customer(customerInput.name, new Email(customerInput.email)))
+    expect(customerRepo.saveCustomer).toHaveBeenCalledWith({
+      name: "any_name",
+      email: "email@mail.com",
+    })
   })
 
   it('should return success and new user created', async () => {
     const customerRepo = mock<ICustomerRepository>();
     customerRepo.emailExists.mockResolvedValueOnce(false);   
-    const customerSaved = new Customer("any_name", new Email("mail@mail.com"), 1);
-    customerRepo.saveCustomer.mockResolvedValueOnce(customerSaved);
+    customerRepo.saveCustomer.mockResolvedValueOnce({
+      name: "any_name",
+      email: "mail@mail.com",
+      id: 1
+    });
     const sut = new CreateCustomerUserCase(customerRepo);
 
     const result = await sut.execute(customerInput);

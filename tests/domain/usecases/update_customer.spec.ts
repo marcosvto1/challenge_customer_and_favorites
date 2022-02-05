@@ -1,85 +1,29 @@
-import { Contract, Notifiable, Notification } from "@/core";
+import { mock, MockProxy } from "jest-mock-extended";
 import { Customer } from "@/domain/entities/customer";
-import { CustomerMap } from "@/domain/mappers/customerMap";
 import { ICustomerRepository } from "@/domain/repositories/customer";
 import { Email } from "@/domain/vos/email";
-import { Result } from "@/shared/results/result";
-import { IUseCaseInput, IUseCaseOutput, UserCase } from "@/shared/usecases/usecase";
-import { mock, MockProxy } from "jest-mock-extended";
+import { UserCase } from "@/shared/usecases/usecase";
+import { UpdateCustomerUseCase } from "@/domain/usecases/customers/update/update-customer";
+import { UpdateCustomerInput } from "@/domain/usecases/customers/update/update.input";
 
-export class UpdateCustomerInput extends Notifiable implements IUseCaseInput {
-
-  constructor (
-    public id: number,
-    public name: string,
-    public email: string
-  ) {
-    super();
-  }
-
-  validate(): void {
-    this.addNotifications([
-      new Contract()
-      .requires(this.id, "id", "O id é obrigatório")
-      .requires(this.name, "name", "O campo nome é obrigatório")
-      .requires(this.email, "email", "O campo Email é obrigatório")
-      .isEmail(this.email, "email", "O campo Email esta com formato inválid")
-    ])
-  }
-}
-
-export class UpdateCustomerUseCase extends Notifiable implements UserCase<IUseCaseInput, IUseCaseOutput> {
-  private readonly customerRepo: ICustomerRepository;
-
-  constructor(customerRepo: ICustomerRepository) {
-    super();
-    this.customerRepo =customerRepo;
-  }
-  
-  async execute(input: UpdateCustomerInput) {
-    input.validate();
-    if (!input.isValid()) {
-      return Result.Failed(input.getNotifications())
-    }
-
-    // Get customer by Id
-    const customerFound = await this.customerRepo.findCustomerById(input.id);
-    if (!customerFound) {
-      return Result.Failed(new Notification("id", `Custumer not found to id ${input.id}`))
-    }
-
-    let emailAlreadyExists = false;
-    if (customerFound.getEmail().getValue() !== input.email) {
-      emailAlreadyExists = await this.customerRepo.emailExists(input.email);
-    }
-
-    if (emailAlreadyExists === true) {
-      return Result.Failed(new Notification("email", "Este Email Já Existe"))
-    }
-    
-    customerFound.setEmailAddress(new Email(input.email))
-    customerFound.setName(input.name);
-    if (!customerFound.isValid()) {
-      return Result.Failed(customerFound.getNotifications());
-    }
-
-    const customerUpdated = await this.customerRepo.updateCustomer(customerFound);
-    console.log(customerUpdated);
-    if (!customerUpdated.isValid()) {
-      return Result.Failed(customerFound.getNotifications());
-    }
-
-    return Result.Ok(CustomerMap.toResponse(customerUpdated))
-  }
-}
 
 describe('Update Customer', () => {
   let customerRepositor: MockProxy<ICustomerRepository>;
   let sut: UserCase;
 
   beforeAll(() => {
-    const customerUpdated = new Customer("name", new Email("mail@mail.com"), 1);
-    const customerSaved  = new Customer("name", new Email("mailsaved@mail.com"), 1);
+    const customerSaved = {
+      id: 1,
+      email: "mailsaved@mail.com",
+      name: "name"
+    };
+
+    const customerUpdated = {
+      id: 1,
+      email: "mail@mail.com",
+      name: "name"
+    }
+
 
     customerRepositor = mock();
     customerRepositor.updateCustomer.mockResolvedValue(customerUpdated);
@@ -121,7 +65,13 @@ describe('Update Customer', () => {
 
   describe('when the input.email is different of saved', () => {
     it('should call emailExists',  async () => {
-      customerRepositor.findCustomerById.mockResolvedValueOnce(new Customer("name", new Email("mailsaved@mail.com"), 1))
+      customerRepositor.findCustomerById.mockResolvedValueOnce({
+        id: 1,
+        email: "mailsaved@mail.com",
+        name: "name"
+      });
+
+      new Customer("name", new Email("mailsaved@mail.com"), 1)
       const updateCustomerInput = new UpdateCustomerInput(1, "name", "mail@mail.com");
       
       await sut.execute(updateCustomerInput);
@@ -130,7 +80,12 @@ describe('Update Customer', () => {
     })
   
     it('should return error if emailExists returns true', async () => {
-      customerRepositor.findCustomerById.mockResolvedValueOnce(new Customer("name", new Email("mailsaved@mail.com"), 1))
+      customerRepositor.findCustomerById.mockResolvedValueOnce({
+        id: 1,
+        email: "mailsaved@mail.com",
+        name: "name"
+      });
+
       customerRepositor.emailExists.mockResolvedValueOnce(true);
 
       const updateCustomerInput = new UpdateCustomerInput(1, "name", "mail@mail.com");
@@ -146,8 +101,11 @@ describe('Update Customer', () => {
     
     await sut.execute(updateCustomerInput);
 
-    const expectedCalledCustomer = new Customer("name", new Email("mail@mail.com"), 1)
-    expect(customerRepositor.updateCustomer).toHaveBeenCalledWith(expectedCalledCustomer)
+    expect(customerRepositor.updateCustomer).toHaveBeenCalledWith({
+      id: 1,
+      name: "name",
+      email: "mail@mail.com"
+    });
   })
 
   it('should return success if updateCustomer performed with successfully', async () => {

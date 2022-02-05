@@ -1,10 +1,9 @@
 {
-  "compilerOptions": {
-    "incremental": true,
-    "noImplicitOverride": true,
+   "compilerOptions": {
+
     "outDir": "dist",
     "rootDirs": ["src", "tests"],
-    "target": "es2021",
+    "target": "es2019",
     "sourceMap": true,
     "module": "commonjs",
     "moduleResolution": "node",

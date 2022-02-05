@@ -13,4 +13,8 @@ export class Email extends ValueObject {
       .isEmail(address, "Email", "Email com formato inválido")
     ])
   }
+
+  public getValue() {
+    return this.address;
+  }
 }

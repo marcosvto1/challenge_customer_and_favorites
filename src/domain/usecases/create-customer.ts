@@ -1,3 +1,0 @@
-interface CreateCustomer {
-  execute: (createCustomerDto) =>
-}

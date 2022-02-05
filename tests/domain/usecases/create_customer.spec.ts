@@ -1,119 +1,10 @@
-import { Contract, Notifiable, Notification } from '@/core';
+import { mock } from 'jest-mock-extended'
 import { Customer } from '@/domain/entities/customer';
+import { ICustomerRepository } from '@/domain/repositories/customer';
+import { CreateCustomerUserCase } from '@/domain/usecases/customers/create/create-customer';
+import { CreateCustomerInput } from '@/domain/usecases/customers/create/customer.input';
 import { Email } from '@/domain/vos/email';
-import { mock, MockProxy } from 'jest-mock-extended'
 
-interface IUseCaseInput {
-  validate(): void
-}
-
-export class CreateCustomerInput extends Notifiable implements IUseCaseInput {
-
-  constructor(
-    public name: string,
-    public email: string
-  ) {
-    super();
-  }
-
-  validate(): void {
-    this.addNotifications([
-      new Contract().requires(this.name, "name", "Nome Obrigatório")
-      .requires(this.email, "email", "Email obrigatório")
-      .isEmail(this.email, "email", "Email inválido")
-    ])
-  }
-
-}
-
-interface IUserCaseResult {
-  success: boolean
-  messages: Notification[]
-}
-
-class UserCaseResult {
-  public success: boolean;
-  public messages: Notification[];
-
-  public constructor(success: boolean, messages: Notification[]) {
-    this.success = success;
-    this.messages = messages;
-  }
-
-  public static create() {
-    return new UserCaseResult(false, []);
-  }
-
-}
-
-
-export interface ICustomerRepository {
-  emailExists(email: string): Promise<boolean> 
-}
-
-export class CustomerRepo implements ICustomerRepository {
-  emailExists(email: string): Promise<boolean> {
-    throw new Error("Method not implemented.");
-  }
-}
-export class CreateCustomerUserCase extends Notifiable {
-  private customerRepo: ICustomerRepository;
-  constructor(
-     customerRepo: ICustomerRepository
-  ) {
-    super();
-    this.customerRepo = customerRepo;
-  }
-  
-  async execute(customerInput: CreateCustomerInput): Promise<IUserCaseResult> {
-    // Validate Input Data
-    customerInput.validate();
-    if (!customerInput.isValid()) {
-      this.addNotifications([customerInput])
-      return new UserCaseResult(false, customerInput.getNotifications());
-    }
-
-    // Verificar se já existe um email de customer que esta cadastrado
-    const emailAlreadyExists = await this.customerRepo.emailExists(customerInput.email);
-    if (!emailAlreadyExists) {
-      this.addNotification("Email", "Este E-mail já está em uso");
-    }
-
-    if (this.isValid()) {
-      return new UserCaseResult(false, this.getNotifications());
-    }
-    
-    
-    return new UserCaseResult(false, []);
-
-    // const email = new Email(customerDto.email);
-    // const customer = new Customer(customerDto.name, email)
-    // this.addNotifications([email, customer]);
-
-    // if (this.isValid()) {
-    //   return this.getNotifications();
-    // }
-
-    // if (!email.isValid()) {
-    //   return email.getNotifications();
-    // }
-
-    // const customerAlreadyExists = await this.customerRepo.existsByEmail(customerDto.email);
-    // if (customerAlreadyExists) {
-    //   this.addNotification("Customer.id", "Customer already exists")
-    //   return this.getNotifications();
-    // }
-
-  
-    // if (!customer.isValid()) {
-    //   return customer.getNotifications();
-    // }
-    
-    // /// this.customerRepo.saveCustomer(customer);
-
-    // return new UserCaseResult(false, []);
-  }
-}
 
 describe('CreateCustomerCustomer', () => {
   let customerInput: CreateCustomerInput;
@@ -129,9 +20,7 @@ describe('CreateCustomerCustomer', () => {
 
     const response = await sut.execute(customerInputInvalid);
 
-    expect(sut.isValid()).toBeFalsy();
     expect(response.success).toBeFalsy();
-    expect(response.messages[0]).toBeInstanceOf(Notification);
   });
 
   it('should call CustomerRepository.emailExists with correct param', async () => {
@@ -141,42 +30,44 @@ describe('CreateCustomerCustomer', () => {
     await sut.execute(customerInput);
 
     expect(customerRepo.emailExists).toBeCalledWith(customerInput.email);
+    expect(customerRepo.emailExists).toBeCalledTimes(1);
   })
 
-  // it('should is failed if already exists customer', async () => {
-  //   const customerRepo = mock<ICustomerRepository>();
-  //   customerRepo.existsByEmail.mockResolvedValueOnce(true);    
-  //   const sut = new CreateCustomerUserCase(customerRepo);
+  it('should return false if already exists email', async () => {
+    const customerRepo = mock<ICustomerRepository>();
 
-  //   await sut.execute(customerDto);
+    customerRepo.emailExists.mockResolvedValueOnce(true);
+    const sut = new CreateCustomerUserCase(customerRepo);
 
-  //   const expected = sut.getNotifications().find(el => el.key === "Customer.id")
-  //   expect(sut.isValid()).toBeFalsy()
-  //   expect(expected).toEqual(expected);
-  // });
+    const result = await sut.execute(customerInput);    
+    
+    expect(result.success).toBeFalsy();
+  });
 
-  // it('should is failed if name is empty', async () => {
-  //   const customerRepo = mock<ICustomerRepository>();
-  //   customerRepo.existsByEmail.mockResolvedValueOnce(false);    
-  //   const sut = new CreateCustomerUserCase(customerRepo);
+  it('should call saveCustomer with correct params', async () => {
+    const customerRepo = mock<ICustomerRepository>();
+    customerRepo.emailExists.mockResolvedValueOnce(false);
+    const sut = new CreateCustomerUserCase(customerRepo);
 
-  //   await sut.execute({...customerDto, name: ""})
+    await sut.execute(customerInput)
 
-  //   const expected = sut.getNotifications().find(el => el.key === "Customer.name")
-  //   expect(sut.isValid()).toBeFalsy()
-  //   expect(expected).toEqual(expected);
-  // })
+    expect(customerRepo.saveCustomer).toBeCalledWith(new Customer(customerInput.name, new Email(customerInput.email)))
+  })
 
-  // it('should call CustomerRepository.saveCustomer with correct params', async () => {
-  //   const customerRepo = mock<ICustomerRepository>();
-  //   customerRepo.existsByEmail.mockResolvedValueOnce(false);    
-  //   const sut = new CreateCustomerUserCase(customerRepo);
+  it('should return success and new user created', async () => {
+    const customerRepo = mock<ICustomerRepository>();
+    customerRepo.emailExists.mockResolvedValueOnce(false);   
+    const customerSaved = new Customer("any_name", new Email("mail@mail.com"), 1);
+    customerRepo.saveCustomer.mockResolvedValueOnce(customerSaved);
+    const sut = new CreateCustomerUserCase(customerRepo);
 
-  //   await sut.execute(customerDto);
+    const result = await sut.execute(customerInput);
 
-  //   expect(sut.isValid()).toBeFalsy()
-
-  //   const expected = sut.getNotifications().find(el => el.key === "Customer.id")
-  //   expect(expected).toEqual(expected);
-  // })
+    expect(result.success).toBeTruthy();
+    expect(result.data).toEqual({
+      "email": "mail@mail.com",
+      "id": 1,
+      "name": "any_name"
+    })
+  })
 })

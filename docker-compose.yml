@@ -3,12 +3,14 @@ version: '3'
 services:
   db:
     image: postgres
+    restart: always
     environment:
       POSTGRES_PASSWORD: "challange"
     ports:
       - "15432:5432"
     volumes:
       - ./data:/var/lib/postgres/data
+      - ./scripts/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
     networks:
       - infra-networks
 

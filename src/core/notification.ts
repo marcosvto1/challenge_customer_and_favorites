@@ -1,6 +1,6 @@
 export class Notification {
   constructor(
-    public key: string,
-    public value: string
+    public field: string,
+    public message: string
   ) {}
 }

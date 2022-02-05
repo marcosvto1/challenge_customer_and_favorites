@@ -20,4 +20,6 @@ export abstract class Notifiable {
   public getNotifications() {
     return this.notifications;
   }
+
+
 }

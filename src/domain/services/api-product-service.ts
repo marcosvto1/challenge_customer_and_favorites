@@ -1,3 +1,6 @@
+import { IProduct } from "@/domain/entities/product";
+
 export interface IProductAPIService {
-  productExists: (id: string) => Promise<boolean>;
+  findOneProduct: (id: string) => Promise<IProduct | undefined>;
 }
+

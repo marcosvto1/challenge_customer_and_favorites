@@ -1,4 +1,4 @@
-import { IWishlistRepository, SaveProductInWishlist } from "@/domain/repositories/wishlist";
+import { FindProducts, IWishlistRepository, SaveProductInWishlist } from "@/domain/repositories/wishlist";
 import { Wishlist } from "@/infra/database/postgree/wishlist/wishlist.entity";
 import { getConnection } from "typeorm";
 
@@ -21,4 +21,17 @@ export class WishlistRepository implements IWishlistRepository {
     });
     return !!result === true;
   }
+
+  async findProducts(customerId: number): Promise<FindProducts.Output> {
+    const repository = getConnection('default').getRepository(Wishlist);
+    
+    const records = await repository.find({
+      where: {
+        customerId
+      }
+    });
+
+    return { records };
+  }
+
 }

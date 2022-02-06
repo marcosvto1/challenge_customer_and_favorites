@@ -1,5 +1,6 @@
 export interface ICustomerRepository {
   emailExists(email: string): Promise<boolean>;
+  customerExists(id: number): Promise<boolean>
   saveCustomer(dto: SaveCustomer.Input): Promise<SaveCustomer.Output>;
   findCustomerById(id: number): Promise<FindCustomerById.Output>;
   updateCustomer(dto: UpdateCustomer.Input): Promise<UpdateCustomer.Output>;

@@ -7,7 +7,7 @@ import {createConnection} from "typeorm";
 import { ormconfig } from "@/main/config/database";
 import { makeCustomerControllers } from '@/main/factories/controllers/customer';
 import { makeLoginController } from '@/main/factories/controllers/login';
-import { AddProductWhitelistController } from '@/app/controllers/add-product-whitelist';
+import { makeWishlistControllers } from '@/main/factories/controllers/wishlist';
 
 export class Startup extends Server {
 
@@ -32,7 +32,7 @@ export class Startup extends Server {
 
   public setupControllers() {
     this.addControllers([
-      new AddProductWhitelistController(),
+      ...makeWishlistControllers(),
       ...makeCustomerControllers(),
       makeLoginController(),
     ]);      

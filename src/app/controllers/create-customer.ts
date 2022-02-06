@@ -1,9 +1,13 @@
+import { Controller, Post, ClassMiddleware } from '@overnightjs/core';
+import { Response, Request } from 'express';
+
+import { middleware } from '@/app/middlewares';
 import { CreateCustomerInput } from '@/domain/usecases/customers/create/customer.input';
 import { UserCase } from '@/shared/usecases/usecase';
-import { Controller, Post, Get, Middleware } from '@overnightjs/core';
-import { Response } from 'express';
+
 
 @Controller('customers')
+@ClassMiddleware(middleware.enableAuth())
 export class CreateCustomerController {
   constructor(
     private readonly useCase: UserCase
@@ -11,8 +15,8 @@ export class CreateCustomerController {
 
   @Post('')
   public async create(req: Request, res: Response): Promise<void> {
-    const body = req.body as any;
-    const createCustomerInput = new CreateCustomerInput(body.name, body.email)
+    const {  name, email } = req.body;
+    const createCustomerInput = new CreateCustomerInput(name, email)
     try {
       const result = await this.useCase.execute(createCustomerInput);
       if (result.success) {

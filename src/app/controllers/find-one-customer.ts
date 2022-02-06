@@ -1,9 +1,11 @@
+import { middleware } from '@/app/middlewares';
 import { FindOneCustomerInput } from '@/domain/usecases/customers/findOne/find-one-customer.input';
 import { UserCase } from '@/shared/usecases/usecase';
-import { Controller, Get, Put } from '@overnightjs/core';
+import { ClassMiddleware, Controller, Get } from '@overnightjs/core';
 import { Response, Request } from 'express';
 
 @Controller('customers')
+@ClassMiddleware(middleware.enableAuth())
 export class FindOneCustomerController {
   constructor(
     private readonly useCase: UserCase

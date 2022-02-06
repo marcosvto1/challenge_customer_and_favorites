@@ -29,7 +29,7 @@ export class LoginUseCase extends Notifiable implements UserCase<IUseCaseInput, 
     try {
       const resultGetUserByEmail = await this.userRepo.getUserByEmail(input.email);
       if (!resultGetUserByEmail) {
-        return Result.Failed(new Notification("email", "o campo :email não existe"))
+        return Result.Failed(new Notification("email", "Email não encontrado"))
       }
   
       const userFounded = UserMap.toDomain(resultGetUserByEmail);

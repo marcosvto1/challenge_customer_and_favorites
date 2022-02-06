@@ -5,9 +5,9 @@ import { middleware } from "@/app/middlewares";
 import { UserCase } from "@/shared/usecases/usecase";
 import { DeleteCustomerInput } from '@/domain/usecases/customers/delete/delete-customer.input';
 
-@Controller('customer')
+@Controller('customers')
 @ClassMiddleware(middleware.enableAuth())
-export class DeleteCustomer {
+export class DeleteCustomerController {
   constructor(
     private readonly useCase: UserCase
   ) {}
@@ -18,9 +18,12 @@ export class DeleteCustomer {
     try {
       const result = await this.useCase.execute(new DeleteCustomerInput(+id))
       if (result.success) {
-        res.status(204);
+        res.status(204).send();
+      } else {
+        res.status(400).send(result)
       }
     } catch (error) {
+      console.log(error);
       if (error instanceof Error) {
         res.status(500).send({
           message: error.message

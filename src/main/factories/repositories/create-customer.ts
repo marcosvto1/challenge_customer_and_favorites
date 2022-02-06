@@ -1,4 +1,4 @@
-import { CustomerRepository } from "@/provider/database/postgree/customer/customer.repository"
+import { CustomerRepository } from "@/infra/database/postgree/customer/customer.repository"
 
 export const makeCustomerRepository = () => {
   return new CustomerRepository();

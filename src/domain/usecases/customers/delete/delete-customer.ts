@@ -27,7 +27,10 @@ export class DeleteCustomerUseCase extends Notifiable implements UserCase<IUseCa
       return Result.Ok(hasDeleted)
     } catch (err) {
       console.log(err);
-      return Result.Failed(new Notification("AppError", "Unexpected error"))
+      if (err instanceof Error) {
+        return Result.Failed(new Notification("UnexpectedError", `${err.message}`))
+      }
+      return Result.Failed(new Notification("UnexpectedError", `App Error`))
     }
   }
 }

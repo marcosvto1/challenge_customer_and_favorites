@@ -6,6 +6,7 @@ import * as cors from 'cors';
 import {createConnection} from "typeorm";
 import { ormconfig } from "@/main/config/database";
 import { makeCustomerControllers } from '@/main/factories/controllers/customer';
+import { makeLoginController } from '@/main/factories/controllers/login';
 
 export class Startup extends Server {
 
@@ -30,7 +31,8 @@ export class Startup extends Server {
 
   public setupControllers() {
     this.addControllers([
-      ...makeCustomerControllers(),     
+      ...makeCustomerControllers(),
+      makeLoginController() 
     ]);      
   }
 

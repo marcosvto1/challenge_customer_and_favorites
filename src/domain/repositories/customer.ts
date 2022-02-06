@@ -4,6 +4,7 @@ export interface ICustomerRepository {
   findCustomerById(id: number): Promise<FindCustomerById.Output>;
   updateCustomer(dto: UpdateCustomer.Input): Promise<UpdateCustomer.Output>;
   findAllCustomer(dto: FindAllCustomer.Input): Promise<FindAllCustomer.Output>;
+  deleteCustomer(dto: DeleteCustomer.Input): Promise<DeleteCustomer.Output>;
 }
 
 export namespace EmailExists {
@@ -69,4 +70,10 @@ export namespace UpdateCustomer {
     name: string;
     email: string;
   } | undefined
+}
+
+export namespace DeleteCustomer {
+  export type Input = number;
+
+  export type Output = boolean;
 }

@@ -8,7 +8,6 @@ enum Paginate {
 }
 
 export class CustomerRepository implements ICustomerRepository {
-
   async findAllCustomer(dto: FindAllCustomer.Input): Promise<FindAllCustomer.Output> {
     const repository = getConnection('default').getRepository(CustomerPersistency);
 
@@ -81,5 +80,11 @@ export class CustomerRepository implements ICustomerRepository {
     return {
       ...result
     };
+  }
+
+  async deleteCustomer(id: number): Promise<boolean> {
+    const repository = getConnection('default').getRepository(CustomerPersistency);
+    const result = await repository.delete(id);
+    return result.affected === 1
   }
 }

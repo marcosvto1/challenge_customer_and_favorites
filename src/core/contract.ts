@@ -22,4 +22,13 @@ export class Contract extends Notifiable {
     }
     return this;
   }
+
+  public isGUID(value: string, key: string, message: string) {
+    // regex by geeksForGeeks
+    const rgex =/^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$/i
+    if (!rgex.test(value)) {
+      this.addNotification(key, message || "GUID invalid")
+    }
+    return this;
+  }
 }

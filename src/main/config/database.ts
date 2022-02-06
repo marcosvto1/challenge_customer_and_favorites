@@ -1,8 +1,8 @@
-import { Customer } from '@/provider/database/postgree/customer/customer.entity'
+import { Customer } from '@/infra/database/postgree/customer/customer.entity'
+import { User } from '@/infra/database/postgree/user/user.entity'
 import * as dotenv from 'dotenv'
 import { ConnectionOptions } from 'typeorm'
 dotenv.config()
-
 
 export const ormconfig: ConnectionOptions = {
   type: 'postgres',
@@ -11,5 +11,5 @@ export const ormconfig: ConnectionOptions = {
   username: process.env.DB_USERNAME,
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
-  entities: [Customer]
+  entities: [Customer, User]
 }

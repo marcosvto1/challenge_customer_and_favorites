@@ -1,4 +1,5 @@
 import { Notifiable, Notification } from "@/core";
+import { Product } from "@/domain/entities/product";
 import { WishlistMap } from "@/domain/mappers/wishlistMap";
 import { ICustomerRepository } from "@/domain/repositories/customer";
 import { IWishlistRepository } from "@/domain/repositories/wishlist";
@@ -37,8 +38,8 @@ export class AddProductWishlistUseCase extends Notifiable implements UserCase<IU
       }
 
       // Verifica se existe o product
-      const existsProduct = await this.productApiService.productExists(input.productId);
-      if (!existsProduct) {
+      const productApiFound = await this.productApiService.findOneProduct(input.productId);
+      if (!productApiFound) {
         return Result.Failed(new Notification("productId", "product not found"))
       }
 
@@ -52,9 +53,24 @@ export class AddProductWishlistUseCase extends Notifiable implements UserCase<IU
         return Result.Failed(new Notification("productId", "The product alread exists in wishlist"))
       }
 
+      const product = new Product(
+          productApiFound.id, 
+          productApiFound.title, 
+          productApiFound.price, 
+          productApiFound.image, 
+          productApiFound.reviewScore)
+      
+      if (!product.isValid()) {
+        return Result.Failed(product.getNotifications())
+      }
+
       const resultSaveProduct = await this.whishListRepository.saveProductInWhishlist({
-        productId: input.productId,
-        customerId: input.customerId
+        productId: product.id,
+        customerId: input.customerId,
+        title: product.title,
+        price: product.price,
+        image: product.image,
+        reviewScore: product.reviewScore,
       });
       if (!resultSaveProduct) {
         return Result.Failed(new Notification("AddProduct", "failed to save product in wishlist"))

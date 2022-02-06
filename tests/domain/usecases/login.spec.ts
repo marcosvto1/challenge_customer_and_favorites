@@ -22,6 +22,7 @@ describe('login', () => {
     authService = mock();
     input = new LoginUseCaseInput("mail@mail.com", "any_password");
     passwordHashed = await bcript.hashSync('any_password', 12);
+    console.log(passwordHashed);
     userSaved = {
       id: 1,
       name: 'any_name',

@@ -8,6 +8,13 @@ export class Contract extends Notifiable {
     return this;
   }
 
+  public isGreaterThan(value: number, comparer: number, key: string, message?: string): Contract {
+    if (value <= comparer) {
+      this.addNotification(key, message || `The value ${value} must be greater than ${comparer}`)
+    }
+    return this;
+  }
+
   public isEmail(value: any, key: string, message: string): Contract {
     const rgex =/^[a-z0-9.]+@[a-z0-9]+\.[a-z]+(\.[a-z]+)?$/i
     if (!rgex.test(value)) {

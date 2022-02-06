@@ -18,7 +18,17 @@ describe('AddProductToWishList', () => {
   const productInWishlistSaved = {
     id: '1068e0da-5b3d-47aa-a48c-1c434c5cf8a1',
     customerId: customerId,
-    productId: productId
+    productId: productId,
+    title: "any_name",
+    price: 10,
+    image: "any_image_url"
+  }
+
+  const productAPI = {
+    id: productId,
+    title: "any_name",
+    price: 10,
+    image: "any_image_url"
   }
 
   beforeAll(() => {
@@ -27,7 +37,7 @@ describe('AddProductToWishList', () => {
     wishlistRepository = mock();
     input = new AddProductWishlistInput(productId, customerId);
     customerRepository.customerExists.mockResolvedValue(true);
-    productApiService.productExists.mockResolvedValue(true);
+    productApiService.findOneProduct.mockResolvedValue(productAPI);
     wishlistRepository.productAlreadyExistsInWishlist.mockResolvedValueOnce(false)
     wishlistRepository.saveProductInWhishlist.mockResolvedValue(productInWishlistSaved);
   });
@@ -58,15 +68,15 @@ describe('AddProductToWishList', () => {
     expect(result.success).toBeFalsy()
   });
 
-  it('should call productExists with correct params', async () => {
+  it('should call findOneProduct with correct params', async () => {
     await sut.execute(input);
 
-    expect(productApiService.productExists).toHaveBeenCalledWith(productId)
-    expect(productApiService.productExists).toHaveBeenCalledTimes(1)
+    expect(productApiService.findOneProduct).toHaveBeenCalledWith(productId)
+    expect(productApiService.findOneProduct).toHaveBeenCalledTimes(1)
   });
 
-  it('should return error if productExists return false', async () => {
-    productApiService.productExists.mockResolvedValueOnce(false);
+  it('should return error if findOneProduct return undefined', async () => {
+    productApiService.findOneProduct.mockResolvedValueOnce(undefined);
 
     const result = await sut.execute(input);
 
@@ -93,7 +103,10 @@ describe('AddProductToWishList', () => {
 
     expect(wishlistRepository.saveProductInWhishlist).toHaveBeenCalledWith({
       productId,
-      customerId
+      customerId,
+      title: "any_name",
+      price: 10,
+      image: "any_image_url"
     })
     expect(wishlistRepository.saveProductInWhishlist).toHaveBeenCalledTimes(1)
   });

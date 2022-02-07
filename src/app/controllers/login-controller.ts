@@ -3,7 +3,7 @@ import { UserCase } from "@/shared/usecases/usecase";
 import { Controller, Post } from "@overnightjs/core";
 import { Request, Response } from 'express'
 
-@Controller('auth')
+@Controller('api/auth')
 export class LoginController {
   constructor (
     private readonly useCase: UserCase

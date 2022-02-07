@@ -6,7 +6,7 @@ import { CreateCustomerInput } from '@/domain/usecases/customers/create/customer
 import { UserCase } from '@/shared/usecases/usecase';
 
 
-@Controller('customers')
+@Controller('api/customers')
 @ClassMiddleware(middleware.enableAuth())
 export class CreateCustomerController {
   constructor(

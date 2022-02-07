@@ -5,7 +5,7 @@ import { middleware } from "@/app/middlewares";
 import { UserCase } from "@/shared/usecases/usecase";
 import { DeleteCustomerInput } from '@/domain/usecases/customers/delete/delete-customer.input';
 
-@Controller('customers')
+@Controller('api/customers')
 @ClassMiddleware(middleware.enableAuth())
 export class DeleteCustomerController {
   constructor(

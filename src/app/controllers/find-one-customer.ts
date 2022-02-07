@@ -4,7 +4,7 @@ import { UserCase } from '@/shared/usecases/usecase';
 import { ClassMiddleware, Controller, Get } from '@overnightjs/core';
 import { Response, Request } from 'express';
 
-@Controller('customers')
+@Controller('api/customers')
 @ClassMiddleware(middleware.enableAuth())
 export class FindOneCustomerController {
   constructor(

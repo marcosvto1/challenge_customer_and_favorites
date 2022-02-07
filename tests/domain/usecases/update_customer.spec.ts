@@ -63,6 +63,21 @@ describe('Update Customer', () => {
     expect(result.success).toBeFalsy();
   })
 
+  it('should return error if findCustomer return invalid data',  async () => {
+    customerRepositor.findCustomerById.mockResolvedValueOnce(
+      {
+        id: 1,
+        email: "mailsaved@mail.com",
+        name: ""
+      }
+    );
+    const updateCustomerInput = new UpdateCustomerInput(1, "name", "mail@mail.com");
+    
+    const result = await sut.execute(updateCustomerInput);
+
+    expect(result.success).toBeFalsy();
+  })
+
   describe('when the input.email is different of saved', () => {
     it('should call emailExists',  async () => {
       customerRepositor.findCustomerById.mockResolvedValueOnce({
@@ -106,6 +121,30 @@ describe('Update Customer', () => {
       name: "name",
       email: "mail@mail.com"
     });
+  })
+
+  it('should return error if updateCustomer return undefined', async () => {
+    customerRepositor.updateCustomer.mockResolvedValueOnce(undefined);
+
+    const updateCustomerInput = new UpdateCustomerInput(1, "name", "mail@mail.com");
+    
+    const result = await sut.execute(updateCustomerInput);
+
+    expect(result.success).toBeFalsy();
+  })
+
+  it('should return error if updateCustomer return invalid data', async () => {
+    customerRepositor.updateCustomer.mockResolvedValueOnce({
+      id: 1,
+      email: "mail@mail.com",
+      name: ""
+    });
+
+    const updateCustomerInput = new UpdateCustomerInput(1, "name", "mail@mail.com");
+    
+    const result = await sut.execute(updateCustomerInput);
+
+    expect(result.success).toBeFalsy();
   })
 
   it('should return success if updateCustomer performed with successfully', async () => {

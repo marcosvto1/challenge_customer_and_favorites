@@ -35,7 +35,8 @@ export class Startup extends Server {
       ...makeWishlistControllers(),
       ...makeCustomerControllers(),
       makeLoginController(),
-    ]);      
+    ]);
+       
   }
 
   public async databaseSetup() {

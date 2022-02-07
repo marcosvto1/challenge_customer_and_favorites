@@ -30,6 +30,11 @@ export class CreateCustomerController {
       } 
     } catch (error) {
       console.log(error)
+      if (error instanceof Error) {
+        res.status(500).send({
+          message: error.message
+        })
+      }
     }
   }
 }

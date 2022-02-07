@@ -24,10 +24,12 @@ export class FindOneCustomerController {
         res.status(this.getStatus(result.messages)).json(result)
       }
     } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      if (error instanceof Error) {
+        res.status(500).json({
+          success: false,
+          error: error.message
+        });
+      }   
     }
   }
 

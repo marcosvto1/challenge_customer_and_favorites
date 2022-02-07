@@ -22,28 +22,20 @@ export class FindAllCustomerController {
     try {
       const result = await this.useCase.execute(input);
       if (result.success) {
-        res.status(200).json({
+        res.status(200).send({
           'customers': result.data.records,
           'meta': result.data.meta
         })
       } else {
-        res.status(this.getStatus(result.messages)).json(result)
+        res.status(400).send(result)
       }
-    } catch (error: any) {
-      console.log(error);
-      res.status(500).json({
-        success: false,
-        error: error.message
-      });
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(500).send({
+          success: false,
+          error: error.message
+        });
+      }     
     }
-  }
-
-  private getStatus(messages: any) {
-    let status = 400;
-    const notFoundTokenErrorExists = Object.values(messages).includes("NotFoundCustomer")
-    if (notFoundTokenErrorExists) {
-      status = 404;
-    }
-    return status;
   }
 }

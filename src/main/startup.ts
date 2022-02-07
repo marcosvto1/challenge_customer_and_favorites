@@ -1,4 +1,3 @@
-import { Application } from 'express';
 import { Server } from '@overnightjs/core';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
@@ -36,7 +35,6 @@ export class Startup extends Server {
       ...makeCustomerControllers(),
       makeLoginController(),
     ]);
-       
   }
 
   public async databaseSetup() {
@@ -47,9 +45,5 @@ export class Startup extends Server {
     this.app.listen(this.port, () => {
       console.log('Server listening of port:' + this.port);
     });
-  }
-
-  public getApp(): Application {
-    return this.app;
   }
 }

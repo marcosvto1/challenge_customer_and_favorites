@@ -42,12 +42,8 @@ export class UpdateCustomerUseCase extends Notifiable implements UserCase<IUseCa
     
     customerFound.setEmailAddress(new Email(input.email))
     customerFound.setName(input.name);
-    if (!customerFound.isValid()) {
-      return Result.Failed(customerFound.getNotifications());
-    }
-
     const resultUpdateCustomer = await this.customerRepo.updateCustomer({
-      id: customerFound.getId() || input.id,
+      id: input.id,
       name: customerFound.getNome(),
       email: customerFound.getEmail().getValue()
     });

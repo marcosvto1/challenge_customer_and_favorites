@@ -16,7 +16,7 @@
 
 ## Testes
 
-Observação: não foi realizada cobertura para todo projeto
+Observação: não foi realizada cobertura  de teste para todo projeto
 
 ## API
 
@@ -71,14 +71,14 @@ Para as ações de **A1** e **A4** é necessário enviar o seguinte payload list
 
 Para todo requisição de wishlist será necessário passar token de acesso via headers
 
-| Ação                                               | URL                                                  | VERBO    |
-| -------------------------------------------------- | ---------------------------------------------------- | -------- |
-| **A1:** Adicionar Produto na lista de desejo       | **http://localhost:3001/api/customers/:id/wishlist** | **POST** |
-| **A2:** Lista todas os produtos da lista de desejo | http://localhost:3001/api/customers/:id/wishlist     | **GET**  |
+| Ação                                               | URL                                              | VERBO    |
+| -------------------------------------------------- | ------------------------------------------------ | -------- |
+| **A1:** Adicionar Produto na lista de desejo       | http://localhost:3001/api/customers/:id/wishlist | **POST** |
+| **A2:** Lista todas os produtos da lista de desejo | http://localhost:3001/api/customers/:id/wishlist | **GET**  |
 
 
 
-Para as ação de **A1**: enviar como payload:
+Para a ação  **A1**: enviar como payload o seguinte item:
 
 ```json
 {

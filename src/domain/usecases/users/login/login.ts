@@ -43,7 +43,7 @@ export class LoginUseCase extends Notifiable implements UserCase<IUseCaseInput, 
       }
   
       const accessToken: JWTToken = await this.authService.signJWT({
-        userId: userFounded.getId(),
+        userId: userFounded.id,
         name: userFounded.name,
         email: userFounded.email.getValue()
       });

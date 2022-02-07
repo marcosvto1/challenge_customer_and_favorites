@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
 INSERT 
 	INTO users 
     (name, email, password) 
-    VALUES ('administrador', 'admin@admin.com', '$2b$12$jMfmJpofJYeiT7UqwBWtse.7leFfM8Mr9lfFUtfVkuj/C.MkF5BQq');
+    VALUES ('administrador', 'admin@admin.com', '$2b$12$1oZBLaVliNzky3JjZDbqAudd6/vOHXxfxiV8XuHP3GFFepZ/UpMgy');
 
 
 

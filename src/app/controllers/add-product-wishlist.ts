@@ -5,7 +5,7 @@ import { AddProductWishlistInput } from "@/domain/usecases/whitelist/add-product
 import { UserCase } from "@/shared/usecases/usecase";
 
 @Controller('api/customers')
-@ClassMiddleware(middleware.enableAuth())
+@ClassMiddleware([middleware.enableAuth(), middleware.enableRateLimiter()])
 export class AddProductWhitelistController {
   constructor(
     private readonly useCase: UserCase

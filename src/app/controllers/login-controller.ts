@@ -1,9 +1,12 @@
+import { middleware } from "@/app/middlewares";
 import { LoginUseCaseInput } from "@/domain/usecases/users/login/login.input";
 import { UserCase } from "@/shared/usecases/usecase";
-import { Controller, Post } from "@overnightjs/core";
-import { Request, Response } from 'express'
+import { ClassMiddleware, Controller, Post } from "@overnightjs/core";
+import { Request, Response } from 'express';
+
 
 @Controller('api/auth')
+@ClassMiddleware([middleware.enableRateLimiter()])
 export class LoginController {
   constructor (
     private readonly useCase: UserCase
@@ -23,9 +26,11 @@ export class LoginController {
         res.status(400).send({success, messages})
       }
     } catch (error) {
-      res.status(500).send({
-        login: 'fazer login'
-      })
+      if (error instanceof Error) {
+        res.status(500).send({
+          message: error.message
+        });
+      }
     }
   }
 }
